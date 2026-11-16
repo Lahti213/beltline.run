@@ -272,6 +272,10 @@
     line-height: 1.15;
     box-shadow: 3px 3px 0 var(--ink);
   }
+  .marker .sign span { display: block; }
+  .marker .sign.pop { animation: pop .5s ease-out; }
+  @keyframes pop { 0% { transform: scale(1); } 35% { transform: scale(1.18) rotate(-4deg); } 100% { transform: scale(1); } }
+  .marker .sign b { font-variant-numeric: tabular-nums; }
   .marker .sign b { display: block; font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.7em; color: var(--shirt); }
   .marker .post { width: 8px; height: 46px; margin: 0 auto; background: var(--ink); border-radius: 0 0 4px 4px; }
 
@@ -326,7 +330,9 @@
     *, *::before, *::after { animation: none !important; }
   }
   @media (max-width: 560px) {
-    .marker { display: none; }
+    .marker { right: 3vw; bottom: 25%; width: 76px; }
+    .marker .sign { font-size: 10px; padding: 4px 2px; }
+    .marker .post { height: 30px; }
     .clouds { top: -50vh; height: 11vh; opacity: .9; }
     .bubble { transform: translateX(-50%); }
     .bubble::after { left: 50%; margin-left: -7px; }
@@ -397,7 +403,7 @@
     <div class="path"></div>
 
     <div class="marker">
-      <div class="sign">🍑 ATL<b>0.0</b>of 22 miles</div>
+      <div class="sign" id="sign">🍑 ATL<b id="miles">0.0</b><span id="milesLabel">of 22 miles</span></div>
       <div class="post"></div>
     </div>
 
@@ -570,6 +576,61 @@
       say(cheers[cheerIdx]);
       cheerIdx = (cheerIdx + 1) % cheers.length;
     });
+
+    /* ---- mile marker: counts up while he runs, faster when he speeds up ---- */
+    var LOOP = 22;                 // the full loop, in miles
+    var MILES_PER_SEC = 0.1 / 1.4; // cartoon pace at normal speed: a full loop in ~5 minutes
+    var milesEl = document.getElementById('miles');
+    var labelEl = document.getElementById('milesLabel');
+    var signEl = document.getElementById('sign');
+    var milestones = {
+      1: 'First mile done! 💪',
+      5: 'Mile 5 and still smiling!',
+      11: 'Halfway around! 🍑',
+      16: 'Legs feeling it… 🥵',
+      20: 'Two to go!!'
+    };
+    var miles = 0, lap = 1, last = null, restUntil = 0;
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function pop() {
+      signEl.classList.remove('pop');
+      void signEl.offsetWidth; // restart the animation
+      signEl.classList.add('pop');
+    }
+
+    function tick(now) {
+      if (last !== null && now >= restUntil) {
+        var dt = Math.min((now - last) / 1000, 0.25); // don't jump ahead after a background tab
+        var before = Math.floor(miles);
+        miles += dt * MILES_PER_SEC * speeds[level];
+
+        if (miles >= LOOP) {
+          miles = LOOP;
+          milesEl.textContent = miles.toFixed(1);
+          labelEl.textContent = 'loop done! 🎉';
+          say(lap === 1 ? 'Full loop! 22 miles! 🍑🎉' : 'Loop ' + lap + ' done! 🎉');
+          pop();
+          restUntil = now + 4000;           // catch your breath, then go again
+          setTimeout(function () {
+            lap++;
+            miles = 0;
+            labelEl.textContent = 'of 22 · lap ' + lap;
+            say('Again! 🏃');
+          }, 4000);
+        } else {
+          var mile = Math.floor(miles);
+          if (mile > before) {
+            pop();
+            if (milestones[mile]) say(milestones[mile]);
+          }
+        }
+      }
+      last = now;
+      if (miles < LOOP) milesEl.textContent = miles.toFixed(1);
+      requestAnimationFrame(tick);
+    }
+    if (!reduceMotion) requestAnimationFrame(tick);
   })();
 </script>
 </body>
