@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>beltline.run · Coming Soon</title>
+<meta name="description" content="beltline.run is lacing up. Coming soon.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏃</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky-top: #7fd3ff;
+    --sky-bottom: #d9f4ff;
+    --sun: #ffd23f;
+    --grass: #6cc551;
+    --grass-dark: #4fa63a;
+    --path: #f2c48d;
+    --path-edge: #d99a5b;
+    --ink: #1f2a44;
+    --shirt: #ff5a5f;
+    --shorts: #3d5afe;
+    --skin: #f5b98a;
+    --cream: #fffaf0;
+    --speed: 1;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: "Nunito", system-ui, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(var(--sky-top), var(--sky-bottom) 70%);
+    overflow: hidden;
+    min-height: 100svh;
+  }
+
+  /* ---------- headline ---------- */
+  header {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    padding: clamp(28px, 7vh, 72px) 16px 0;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--cream);
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    padding: 4px 16px;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    box-shadow: 3px 3px 0 var(--ink);
+    transform: rotate(-3deg);
+  }
+  h1 {
+    font-family: "Lilita One", "Nunito", sans-serif;
+    font-weight: 400;
+    font-size: clamp(48px, 11vw, 120px);
+    line-height: .95;
+    margin: 14px 0 6px;
+    color: var(--cream);
+    -webkit-text-stroke: 3px var(--ink);
+    paint-order: stroke fill;
+    text-shadow: 5px 6px 0 var(--ink);
+    letter-spacing: .01em;
+  }
+  h1 .dot { color: var(--shirt); }
+  .tagline {
+    font-size: clamp(17px, 2.6vw, 24px);
+    font-weight: 800;
+    margin: 6px 0 0;
+  }
+  .sub {
+    font-size: clamp(14px, 1.9vw, 17px);
+    margin: 6px auto 0;
+    max-width: 34ch;
+    opacity: .8;
+  }
+  .controls {
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  button {
+    font: inherit;
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--ink);
+    background: var(--sun);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 10px 18px;
+    box-shadow: 4px 4px 0 var(--ink);
+    cursor: pointer;
+    transition: transform .08s, box-shadow .08s;
+  }
+  button.alt { background: var(--cream); }
+  button:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+  button:focus-visible { outline: 3px dashed var(--ink); outline-offset: 4px; }
+
+  /* ---------- scene ---------- */
+  .scene {
+    position: fixed;
+    inset: auto 0 0 0;
+    height: 52vh;
+    min-height: 300px;
+    pointer-events: none;
+  }
+  .scene > * { position: absolute; left: 0; right: 0; }
+  .scene > .runner, .scene > .bubble { right: auto; }
+  .scene > .marker { left: auto; }
+
+  .sun {
+    position: fixed;
+    top: 6vh; right: 8vw;
+    width: clamp(70px, 11vw, 130px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    /* the sun is a Georgia peach */
+    background: radial-gradient(circle at 35% 35%, #ffd0a1, #ffa26b 55%, #ff7a59);
+    border: 4px solid var(--ink);
+    border-radius: 50% 50% 48% 48% / 46% 46% 54% 54%;
+    box-shadow: 0 0 0 14px rgba(255, 210, 63, .35);
+    animation: pulse 3s ease-in-out infinite;
+  }
+  .sun .leaf {
+    position: absolute;
+    top: -16%; left: 52%;
+    width: 38%; height: 22%;
+    background: #6cc551;
+    border: 4px solid var(--ink);
+    border-radius: 0 100% 0 100%;
+    transform: rotate(-18deg);
+  }
+  .sun .crease {
+    position: absolute;
+    top: 2%; left: 44%;
+    width: 18%; height: 34%;
+    border-left: 4px solid rgba(31, 42, 68, .55);
+    border-radius: 50%;
+  }
+  .sun::before, .sun::after {
+    content: "";
+    position: absolute;
+    top: 40%;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+  .sun::before { left: 30%; }
+  .sun::after { right: 30%; }
+  .sun span {
+    position: absolute;
+    left: 32%; right: 32%; top: 58%;
+    height: 14%;
+    border: 4px solid var(--ink);
+    border-top: 0;
+    border-radius: 0 0 40px 40px;
+  }
+
+  /* infinite scrolling strips: content duplicated, slide by -50% */
+  .strip {
+    display: flex;
+    width: 200%;
+    will-change: transform;
+    animation: slide linear infinite;
+  }
+  .strip > svg { width: 50%; height: 100%; flex: none; }
+
+  .clouds { top: -42vh; height: 26vh; }
+  .clouds .strip { height: 100%; animation-duration: calc(60s / var(--speed)); }
+
+  .skyline { bottom: 46%; height: 34%; opacity: .9; }
+  .skyline .strip { height: 100%; animation-duration: calc(40s / var(--speed)); }
+
+  .hills { bottom: 30%; height: 26%; }
+  .hills .strip { height: 100%; animation-duration: calc(22s / var(--speed)); }
+
+  .ground {
+    bottom: 0; height: 34%;
+    background: var(--grass);
+    border-top: 4px solid var(--ink);
+  }
+  .path {
+    bottom: 9%; height: 15%;
+    background: var(--path);
+    border-top: 4px solid var(--path-edge);
+    border-bottom: 4px solid var(--path-edge);
+    overflow: hidden;
+  }
+  .path::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 50%;
+    width: 200%;
+    height: 6px;
+    margin-top: -3px;
+    background: repeating-linear-gradient(90deg, var(--cream) 0 40px, transparent 40px 80px);
+    animation: dash calc(.8s / var(--speed)) linear infinite;
+  }
+  .trees { bottom: 23%; height: 34%; }
+  .trees .strip { height: 100%; animation-duration: calc(9s / var(--speed)); }
+
+  /* ---------- runner ---------- */
+  .runner {
+    position: absolute;
+    left: 50%;
+    bottom: 13%;
+    width: clamp(110px, 17vw, 170px);
+    transform: translateX(-50%);
+    z-index: 3;
+  }
+  .runner svg { width: 100%; height: auto; overflow: visible; display: block; }
+  /* one full stride = --T; the two sides run half a stride apart */
+  .runner { --T: calc(.72s / var(--speed)); }
+  .bob { animation: bob calc(var(--T) / 2) ease-in-out infinite; }
+  .runner .j { transform-box: view-box; animation-duration: var(--T); animation-iteration-count: infinite; animation-timing-function: linear; }
+  .thigh   { transform-origin: 60px 98px;  animation-name: thigh; }
+  .shin    { transform-origin: 60px 123px; animation-name: shin; }
+  .upper   { transform-origin: 60px 58px;  animation-name: upper; }
+  .fore    { transform-origin: 60px 77px;  animation-name: fore; }
+  .side-b .j { animation-delay: calc(var(--T) / -2); }
+  .shadow { animation: shadow calc(var(--T) / 2) ease-in-out infinite; transform-origin: 60px 172px; }
+  .sweat { animation: sweat calc(1.2s / var(--speed)) ease-out infinite; opacity: 0; }
+  .sweat.two { animation-delay: calc(.6s / var(--speed)); }
+
+  .bubble {
+    position: absolute;
+    left: 50%;
+    bottom: calc(13% + clamp(110px, 17vw, 170px) * 1.55);
+    transform: translateX(10%);
+    background: var(--cream);
+    border: 3px solid var(--ink);
+    border-radius: 16px;
+    padding: 8px 14px;
+    font-weight: 800;
+    font-size: clamp(14px, 1.8vw, 18px);
+    white-space: nowrap;
+    box-shadow: 3px 3px 0 var(--ink);
+    z-index: 4;
+    transition: opacity .25s;
+  }
+  .bubble::after {
+    content: "";
+    position: absolute;
+    left: 14px; bottom: -14px;
+    border: 7px solid transparent;
+    border-top-color: var(--ink);
+    border-right-color: var(--ink);
+  }
+
+  .marker {
+    position: absolute;
+    right: 9vw;
+    bottom: 24%;
+    z-index: 2;
+    width: clamp(86px, 11vw, 120px);
+    text-align: center;
+  }
+  .marker .sign {
+    background: var(--cream);
+    border: 3px solid var(--ink);
+    border-radius: 10px;
+    padding: 6px 4px;
+    font-weight: 800;
+    font-size: clamp(11px, 1.3vw, 14px);
+    line-height: 1.15;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .marker .sign b { display: block; font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.7em; color: var(--shirt); }
+  .marker .post { width: 8px; height: 46px; margin: 0 auto; background: var(--ink); border-radius: 0 0 4px 4px; }
+
+  footer {
+    position: fixed;
+    bottom: 10px; left: 0; right: 0;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--cream);
+    text-shadow: 1px 1px 0 var(--ink);
+    z-index: 6;
+  }
+
+  @keyframes slide { to { transform: translateX(-50%); } }
+  @keyframes dash { to { transform: translateX(-80px); } }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+  /* runner faces right; positive rotation swings a limb backward.
+     0% = this leg pushing off behind, 50% = this leg reaching forward to land. */
+  @keyframes thigh {
+    0%   { transform: rotate(32deg); }
+    20%  { transform: rotate(-5deg); }
+    45%  { transform: rotate(-48deg); }
+    55%  { transform: rotate(-40deg); }
+    100% { transform: rotate(32deg); }
+  }
+  @keyframes shin {          /* knee folds high on the swing-through, straightens to land */
+    0%   { transform: rotate(45deg); }
+    20%  { transform: rotate(105deg); }
+    40%  { transform: rotate(40deg); }
+    52%  { transform: rotate(8deg); }
+    75%  { transform: rotate(18deg); }
+    100% { transform: rotate(45deg); }
+  }
+  @keyframes upper {         /* arm opposite its leg: forward while that leg is back */
+    0%, 100% { transform: rotate(-38deg); }
+    50%      { transform: rotate(42deg); }
+  }
+  @keyframes fore {          /* elbow stays bent ~90°, a bit tighter on the forward swing */
+    0%, 100% { transform: rotate(-105deg); }
+    50%      { transform: rotate(-70deg); }
+  }
+  @keyframes shadow { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.75); } }
+  @keyframes sweat {
+    0% { opacity: 0; transform: translate(0, 0); }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-22px, 14px); }
+  }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 10px rgba(255,210,63,.35); } 50% { box-shadow: 0 0 0 22px rgba(255,210,63,.2); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; }
+  }
+  @media (max-width: 560px) {
+    .marker { display: none; }
+    .clouds { top: -50vh; height: 11vh; opacity: .9; }
+    .bubble { transform: translateX(-50%); }
+    .bubble::after { left: 50%; margin-left: -7px; }
+  }
+  @media (max-height: 640px) {
+    .scene { height: 46vh; }
+    .sub { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="sun" aria-hidden="true"><span></span><i class="leaf"></i><i class="crease"></i></div>
+
+  <header>
+    <span class="badge">Coming soon</span>
+    <h1>beltline<span class="dot">.</span>run</h1>
+    <p class="tagline">We're still lacing up. 👟</p>
+    <p class="sub">Something fun for running Atlanta's 22-mile loop is on the way. Grab some water and keep a steady pace.</p>
+    <div class="controls">
+      <button id="faster" type="button">Pick up the pace ⚡</button>
+      <button id="cheer" type="button" class="alt">Cheer 📣</button>
+    </div>
+  </header>
+
+  <div class="scene" aria-hidden="true">
+    <div class="clouds">
+      <div class="strip">
+        <svg viewBox="0 0 800 200" preserveAspectRatio="none">
+          <g fill="#fff" stroke="#1f2a44" stroke-width="4">
+            <path d="M60 120 q0-34 34-34 q12-28 44-20 q26-12 40 14 q30 0 30 40 z"/>
+            <path d="M420 80 q0-26 26-26 q10-22 34-16 q20-10 32 10 q24 0 24 32 z"/>
+            <path d="M640 150 q0-22 22-22 q8-18 28-14 q18-8 26 8 q20 0 20 28 z"/>
+          </g>
+        </svg>
+        <svg viewBox="0 0 800 200" preserveAspectRatio="none">
+          <g fill="#fff" stroke="#1f2a44" stroke-width="4">
+            <path d="M60 120 q0-34 34-34 q12-28 44-20 q26-12 40 14 q30 0 30 40 z"/>
+            <path d="M420 80 q0-26 26-26 q10-22 34-16 q20-10 32 10 q24 0 24 32 z"/>
+            <path d="M640 150 q0-22 22-22 q8-18 28-14 q18-8 26 8 q20 0 20 28 z"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="skyline">
+      <div class="strip">
+        <svg viewBox="0 0 800 200" preserveAspectRatio="none"><use href="#city"/></svg>
+        <svg viewBox="0 0 800 200" preserveAspectRatio="none"><use href="#city"/></svg>
+      </div>
+    </div>
+
+    <div class="hills">
+      <div class="strip">
+        <svg viewBox="0 0 800 200" preserveAspectRatio="none"><use href="#hill"/></svg>
+        <svg viewBox="0 0 800 200" preserveAspectRatio="none"><use href="#hill"/></svg>
+      </div>
+    </div>
+
+    <div class="ground"></div>
+
+    <div class="trees">
+      <div class="strip">
+        <svg viewBox="0 0 800 200" preserveAspectRatio="xMidYMax meet"><use href="#forest"/></svg>
+        <svg viewBox="0 0 800 200" preserveAspectRatio="xMidYMax meet"><use href="#forest"/></svg>
+      </div>
+    </div>
+
+    <div class="path"></div>
+
+    <div class="marker">
+      <div class="sign">🍑 ATL<b>0.0</b>of 22 miles</div>
+      <div class="post"></div>
+    </div>
+
+    <div class="bubble" id="bubble">Almost there!</div>
+
+    <div class="runner">
+      <svg viewBox="0 0 120 180">
+        <ellipse class="shadow" cx="60" cy="172" rx="34" ry="6" fill="#1f2a44" opacity=".25"/>
+        <g class="bob"><g transform="rotate(7 60 100)">
+          <!-- far-side limbs (half a stride out of phase, a shade darker) -->
+          <g class="side-b">
+            <g class="j thigh">
+              <path d="M60 98 L60 123" stroke="#1f2a44" stroke-width="15" stroke-linecap="round"/>
+              <path d="M60 98 L60 123" stroke="#2c3ed6" stroke-width="10" stroke-linecap="round"/>
+              <g class="j shin">
+                <path d="M60 123 L60 150" stroke="#1f2a44" stroke-width="11" stroke-linecap="round"/>
+                <path d="M60 123 L60 150" stroke="#d99a6e" stroke-width="6.5" stroke-linecap="round"/>
+                <path d="M54 156 h20 a6 6 0 0 0 0 -9 h-13 z" fill="#d8dbe6" stroke="#1f2a44" stroke-width="3.5" stroke-linejoin="round"/>
+              </g>
+            </g>
+            <g class="j upper">
+              <path d="M60 58 L60 77" stroke="#1f2a44" stroke-width="13" stroke-linecap="round"/>
+              <path d="M60 58 L60 77" stroke="#e04449" stroke-width="8.5" stroke-linecap="round"/>
+              <g class="j fore">
+                <path d="M60 77 L60 94" stroke="#1f2a44" stroke-width="10" stroke-linecap="round"/>
+                <path d="M60 77 L60 94" stroke="#d99a6e" stroke-width="6" stroke-linecap="round"/>
+                <circle cx="60" cy="96" r="5" fill="#d99a6e" stroke="#1f2a44" stroke-width="3"/>
+              </g>
+            </g>
+          </g>
+          <!-- body -->
+          <path d="M60 54 L60 100" stroke="#1f2a44" stroke-width="26" stroke-linecap="round"/>
+          <path d="M60 54 L60 100" stroke="#ff5a5f" stroke-width="19" stroke-linecap="round"/>
+          <path d="M47 96 h26 v12 a4 4 0 0 1 -4 4 h-18 a4 4 0 0 1 -4 -4 z" fill="#3d5afe" stroke="#1f2a44" stroke-width="3.5"/>
+          <!-- head -->
+          <circle cx="62" cy="30" r="19" fill="#f5b98a" stroke="#1f2a44" stroke-width="4"/>
+          <path d="M44 23 q18 -8 36 0 l0 7 q-18 -7 -36 0 z" fill="#ffd23f" stroke="#1f2a44" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M45 26 l-14 -6 l3 10 z" fill="#ffd23f" stroke="#1f2a44" stroke-width="3" stroke-linejoin="round"/>
+          <circle cx="70" cy="34" r="3" fill="#1f2a44"/>
+          <path d="M66 42 q6 5 12 -1" fill="none" stroke="#1f2a44" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="76" cy="40" r="3.5" fill="#ff8a8a" opacity=".7"/>
+          <path class="sweat" d="M44 34 q-3 5 0 7 q3 -2 0 -7 z" fill="#7fd3ff" stroke="#1f2a44" stroke-width="1.5"/>
+          <path class="sweat two" d="M46 44 q-3 5 0 7 q3 -2 0 -7 z" fill="#7fd3ff" stroke="#1f2a44" stroke-width="1.5"/>
+          <!-- near-side limbs -->
+          <g class="side-a">
+            <g class="j thigh">
+              <path d="M60 98 L60 123" stroke="#1f2a44" stroke-width="15" stroke-linecap="round"/>
+              <path d="M60 98 L60 123" stroke="#3d5afe" stroke-width="10" stroke-linecap="round"/>
+              <g class="j shin">
+                <path d="M60 123 L60 150" stroke="#1f2a44" stroke-width="11" stroke-linecap="round"/>
+                <path d="M60 123 L60 150" stroke="#f5b98a" stroke-width="6.5" stroke-linecap="round"/>
+                <path d="M54 156 h20 a6 6 0 0 0 0 -9 h-13 z" fill="#ff5a5f" stroke="#1f2a44" stroke-width="3.5" stroke-linejoin="round"/>
+              </g>
+            </g>
+            <g class="j upper">
+              <path d="M60 58 L60 77" stroke="#1f2a44" stroke-width="13" stroke-linecap="round"/>
+              <path d="M60 58 L60 77" stroke="#ff5a5f" stroke-width="8.5" stroke-linecap="round"/>
+              <g class="j fore">
+                <path d="M60 77 L60 94" stroke="#1f2a44" stroke-width="10" stroke-linecap="round"/>
+                <path d="M60 77 L60 94" stroke="#f5b98a" stroke-width="6" stroke-linecap="round"/>
+                <circle cx="60" cy="96" r="5" fill="#f5b98a" stroke="#1f2a44" stroke-width="3"/>
+              </g>
+            </g>
+          </g>
+        </g></g>
+      </svg>
+    </div>
+  </div>
+
+  <footer>Made with 🍑 in the ATL · see you at the start line</footer>
+
+  <!-- shared shapes -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <!-- a cartoon, Atlanta-flavored skyline (not to scale!) -->
+      <g id="city" fill="#9fb4d9" stroke="#1f2a44" stroke-width="3" stroke-linejoin="round">
+        <rect x="14" y="115" width="44" height="85"/>
+        <!-- gothic peaked-roof tower -->
+        <path d="M70 200 V64 L91 26 L112 64 V200 z"/>
+        <path d="M91 26 V14" fill="none"/>
+        <!-- round hotel tower -->
+        <rect x="126" y="58" width="34" height="142" rx="5"/>
+        <rect x="122" y="48" width="42" height="13" rx="4" fill="#c9d6ee"/>
+        <!-- brick market with a water tower -->
+        <g>
+          <rect x="176" y="112" width="104" height="88" fill="#d0704f"/>
+          <g fill="#fbe3c4" stroke-width="2">
+            <rect x="186" y="124" width="12" height="14"/><rect x="206" y="124" width="12" height="14"/><rect x="226" y="124" width="12" height="14"/><rect x="246" y="124" width="12" height="14"/>
+            <rect x="186" y="150" width="12" height="14"/><rect x="206" y="150" width="12" height="14"/><rect x="226" y="150" width="12" height="14"/><rect x="246" y="150" width="12" height="14"/>
+          </g>
+          <path d="M240 112 V94 M262 112 V94" fill="none"/>
+          <path d="M234 94 h34 v-20 a17 7 0 0 0 -34 0 z" fill="#d0704f"/>
+          <rect x="198" y="88" width="10" height="24" fill="#b45a3c"/>
+        </g>
+        <rect x="292" y="104" width="46" height="96"/>
+        <!-- tallest tower: stepped gold pyramid crown + spire -->
+        <rect x="350" y="52" width="46" height="148"/>
+        <path d="M350 52 L356 44 H390 L396 52 z"/>
+        <path d="M356 44 L373 14 L390 44 z" fill="#ffd23f"/>
+        <path d="M373 14 V0" fill="none" stroke-width="3.5"/>
+        <rect x="408" y="92" width="40" height="108"/>
+        <!-- crowned tower -->
+        <rect x="460" y="46" width="42" height="154"/>
+        <path d="M460 46 V36 h8 v-8 h26 v8 h8 V46 z" fill="#c9d6ee"/>
+        <rect x="514" y="122" width="56" height="78"/>
+        <path d="M582 200 V78 h36 V62 h18 v138 z"/>
+        <rect x="648" y="100" width="44" height="100"/>
+        <path d="M704 200 V40 l18 -18 l18 18 V200 z"/>
+        <rect x="752" y="120" width="44" height="80"/>
+      </g>
+      <g id="hill">
+        <path d="M-10 210 V120 H0 Q100 40 200 110 T400 100 T600 90 T800 120 H810 V210 z" fill="#8fd672" stroke="#1f2a44" stroke-width="4"/>
+      </g>
+      <g id="tree">
+        <rect x="-5" y="-30" width="10" height="34" rx="3" fill="#8b5a2b" stroke="#1f2a44" stroke-width="3"/>
+        <circle cx="0" cy="-58" r="30" fill="#4fa63a" stroke="#1f2a44" stroke-width="4"/>
+        <circle cx="-10" cy="-66" r="8" fill="#6cc551"/>
+      </g>
+      <g id="pine">
+        <rect x="-4" y="-20" width="8" height="24" fill="#8b5a2b" stroke="#1f2a44" stroke-width="3"/>
+        <path d="M0 -100 L28 -18 H-28 z" fill="#3f9a4a" stroke="#1f2a44" stroke-width="4" stroke-linejoin="round"/>
+      </g>
+      <g id="bush">
+        <path d="M-30 0 q0 -24 20 -22 q8 -16 22 -6 q18 -4 18 28 z" fill="#5bbf48" stroke="#1f2a44" stroke-width="4"/>
+      </g>
+      <!-- trailside mural wall -->
+      <g id="mural" stroke="#1f2a44" stroke-width="3.5" stroke-linejoin="round">
+        <rect x="-78" y="-72" width="156" height="76" rx="4" fill="#fffaf0"/>
+        <path d="M-78 -40 q30 -30 60 0 t60 0 t36 -10 V4 H-78 z" fill="#7fd3ff" stroke-width="0"/>
+        <circle cx="-50" cy="-48" r="15" fill="#ffd23f"/>
+        <path d="M30 -66 q22 6 18 30 q-20 4 -28 -10 q-4 -12 10 -20 z" fill="#ff8a65"/>
+        <path d="M44 -66 q6 -8 14 -6 q-4 8 -14 6 z" fill="#4fa63a" stroke-width="2.5"/>
+        <text x="-6" y="-14" text-anchor="middle" font-family="Lilita One, sans-serif" font-size="40" fill="#ff5a5f" stroke-width="3" paint-order="stroke">ATL</text>
+        <rect x="-78" y="-72" width="156" height="76" rx="4" fill="none"/>
+      </g>
+      <g id="forest">
+        <use href="#tree" x="50" y="196"/>
+        <use href="#pine" x="140" y="196"/>
+        <use href="#mural" x="290" y="196"/>
+        <use href="#bush" x="420" y="196"/>
+        <use href="#tree" x="510" y="196"/>
+        <use href="#pine" x="610" y="196"/>
+        <use href="#tree" x="720" y="196"/>
+      </g>
+    </defs>
+  </svg>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var bubble = document.getElementById('bubble');
+    var speeds = [1, 1.6, 2.4, 3.4];
+    var speedLines = ['Almost there!', 'Tempo run!', 'Negative splits!', 'Full sprint!!'];
+    var cheers = ['Peachy pace! 🍑', 'Watch out for scooters! 🛴', 'Hydrate, it\'s Hotlanta! 🥵', 'Looking strong, ATL!', 'Next stop: Ponce! 🛍️', 'Nice form!', 'Only 21.9 miles to go!', 'Who needs a site? Not me!'];
+    var level = 0, cheerIdx = 0;
+
+    function say(text) {
+      bubble.style.opacity = 0;
+      setTimeout(function () { bubble.textContent = text; bubble.style.opacity = 1; }, 150);
+    }
+
+    document.getElementById('faster').addEventListener('click', function () {
+      level = (level + 1) % speeds.length;
+      root.style.setProperty('--speed', speeds[level]);
+      this.textContent = level === speeds.length - 1 ? 'Cool down 🧊' : 'Pick up the pace ⚡';
+      say(speedLines[level]);
+    });
+
+    document.getElementById('cheer').addEventListener('click', function () {
+      say(cheers[cheerIdx]);
+      cheerIdx = (cheerIdx + 1) % cheers.length;
+    });
+  })();
+</script>
+</body>
+</html>
